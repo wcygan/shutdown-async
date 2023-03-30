@@ -4,6 +4,7 @@
 [<img alt="crates.io" src="https://img.shields.io/crates/v/shutdown-async.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/shutdown-async)
 [<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-shutdown--async-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/shutdown-async)
 [<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/wcygan/shutdown-async/test.yml?branch=main&style=for-the-badge" height="20">](https://github.com/wcygan/shutdown-async/actions?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/wcygan/shutdown-async/branch/main/graph/badge.svg?token=AGLZ67JA6D)](https://codecov.io/gh/wcygan/shutdown-async)
 
 A library for gracefully shutting down asynchronous applications
 
