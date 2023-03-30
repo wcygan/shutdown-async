@@ -112,7 +112,6 @@ impl Default for ShutdownController {
 /// tracks that the signal has been received.
 ///
 /// Callers may query for whether the shutdown signal has been received or not.
-#[derive(Debug)]
 pub struct ShutdownMonitor {
     /// `true` if the shutdown signal has been received
     shutdown_received: bool,

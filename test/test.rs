@@ -55,4 +55,27 @@ mod tests {
         shutdown.shutdown().await;
         assert!(t.await.is_ok());
     }
+
+    #[tokio::test]
+    async fn default() {
+        let shutdown = ShutdownController::default();
+        let monitor = shutdown.subscribe();
+        assert!(!monitor.is_shutdown());
+    }
+
+    #[tokio::test]
+    async fn recv_is_idempotent() {
+        let shutdown = ShutdownController::new();
+
+        let t = tokio::spawn({
+            let mut monitor = shutdown.subscribe();
+            async move {
+                monitor.recv().await;
+                monitor.recv().await;
+            }
+        });
+
+        shutdown.shutdown().await;
+        assert!(t.await.is_ok());
+    }
 }
