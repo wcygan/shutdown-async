@@ -1,11 +1,16 @@
 [package]
 name = "shutdown-async"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2021"
 description = "Asynchronous Shutdown"
 categories = ["asynchronous", "concurrency"]
 keywords = ["async", "asynchronous", "shutdown"]
 license = "MIT"
+
+[[test]]
+name = "test"
+path = "test/test.rs"
+
 
 [dependencies]
 tokio = { version = "1.27.0", features = ["sync"] }
