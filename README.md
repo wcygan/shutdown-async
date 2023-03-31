@@ -16,7 +16,7 @@ Add this to your Cargo.toml:
 
 ```toml
 [dependencies]
-shutdown-async = "0.1.0"
+shutdown-async = "0.1.1"
 ```
 
 You can use the library like so:

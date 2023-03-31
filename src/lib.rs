@@ -35,6 +35,32 @@ use tokio::sync::{broadcast, mpsc};
 /// This is accomplished by creating a [`ShutdownMonitor`] instance for each task
 /// that should be monitored. When [`ShutdownController::shutdown`] is called,
 /// all [`ShutdownMonitor`] instances will be notified that shutdown has started.
+///
+/// # Examples
+///
+/// ```
+/// use shutdown_async::ShutdownController;
+///
+/// #[tokio::main]
+/// async fn main() {
+///   let shutdown = ShutdownController::new();
+///   
+///   tokio::task::spawn({
+///     let mut monitor = shutdown.subscribe();
+///     async move {
+///       // Wait for something to happen
+///       tokio::select! {
+///        _ = monitor.recv() => { println!("shutdown initiated"); }
+///        _ = tokio::time::sleep(ONE_YEAR) => { println!("one year has passed!"); }
+///       }
+///     }
+///   });
+///
+///   shutdown.shutdown().await;
+/// }
+///
+/// static ONE_YEAR: std::time::Duration = std::time::Duration::from_secs(60 * 60 * 24 * 365);
+/// ```
 pub struct ShutdownController {
     /// Used to tell all [`ShutdownMonitor`] instances that shutdown has started.
     notify_shutdown: broadcast::Sender<()>,
@@ -85,7 +111,10 @@ impl ShutdownController {
     /// #[tokio::main]
     /// async fn main() {
     ///  let shutdown = shutdown_async::ShutdownController::new();
+    ///
     ///  // ... do stuff ...
+    ///
+    ///  // Tell all tasks to shutdown
     ///  shutdown.shutdown().await;
     /// }
     /// ```
@@ -112,6 +141,21 @@ impl Default for ShutdownController {
 /// tracks that the signal has been received.
 ///
 /// Callers may query for whether the shutdown signal has been received or not.
+///
+/// # Examples
+///
+/// ```
+/// use shutdown_async::ShutdownMonitor;
+///
+/// async fn run(monitor: &mut ShutdownMonitor) {
+///   while !monitor.is_shutdown() {
+///       tokio::select! {
+///        _ = monitor.recv() => { println!("shutdown initiated"); }
+///        _ = async { /* do work */ } => { println!("one year has passed!"); }
+///       }
+///   }
+/// }
+/// ```
 pub struct ShutdownMonitor {
     /// `true` if the shutdown signal has been received
     shutdown_received: bool,
@@ -145,6 +189,8 @@ impl ShutdownMonitor {
     /// async fn main() {
     ///   let shutdown = shutdown_async::ShutdownController::new();
     ///   let mut monitor = shutdown.subscribe();
+    ///
+    ///   // Assert that the monitor has not yet received the shutdown signal
     ///   assert!(!monitor.is_shutdown());
     /// }
     /// ```
@@ -158,14 +204,9 @@ impl ShutdownMonitor {
     ///
     /// ```
     /// async fn long_lived_task(mut monitor: shutdown_async::ShutdownMonitor) {
-    ///    while !monitor.is_shutdown() {
-    ///       tokio::select! {
-    ///         _ = monitor.recv() => { return; }
-    ///         _ = async { /* do work */ } => { }
-    ///       }
-    ///   }
+    ///    // Wait for the shutdown signal
+    ///    monitor.recv().await;
     /// }
-    ///
     /// ```
     pub async fn recv(&mut self) {
         // If the shutdown signal has already been received, then return
